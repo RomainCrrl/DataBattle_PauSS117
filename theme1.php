@@ -29,7 +29,7 @@ if (!isset($_SESSION['user_id'])) {
         </div>
 
         <div class="chat-container">
-            <div id="chat-box"></div>
+        <div id="chat-box" class="overflow-y-auto p-4 flex flex-col-reverse"></div>
             <div class="chat-input">
                 <input type="text" id="message-input" placeholder="Écris un message..." autofocus>
                 <button onclick="sendMessage()">Envoyer</button>
@@ -44,10 +44,10 @@ if (!isset($_SESSION['user_id'])) {
         // Append a message to the chat history
         function appendMessage(text, sender) {
             let chatBox = document.getElementById("chat-box");
-            let messageDiv = document.createElement("div");
-            messageDiv.classList.add("message", sender === "bot" ? "bot-message" : "user-message");
-            messageDiv.innerText = text;
-            chatBox.appendChild(messageDiv);
+            let messageElement = document.createElement("div");
+            messageElement.classList.add("message", sender === "bot" ? "bot-message" : "user-message");
+            messageElement.innerText = text;
+            chatBox.prepend(messageElement);
         }
 
         // For QCM mode, format and append the question text (filtering out empty options)

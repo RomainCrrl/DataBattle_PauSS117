@@ -44,10 +44,10 @@ if (!isset($_SESSION['user_id'])) {
         // Append a message to the chat history
         function appendMessage(text, sender) {
             let chatBox = document.getElementById("chat-box");
-            let messageDiv = document.createElement("div");
-            messageDiv.classList.add("message", sender === "bot" ? "bot-message" : "user-message");
-            messageDiv.innerText = text;
-            chatBox.appendChild(messageDiv);
+            let messageElement = document.createElement("div");
+            messageElement.classList.add("message", sender === "bot" ? "bot-message" : "user-message");
+            messageElement.innerText = text;
+            chatBox.prepend(messageElement);
         }
 
         // For QCM mode, format and append the question text (filtering out empty options)

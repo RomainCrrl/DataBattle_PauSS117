@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 <html lang="fr" class="dark">
 <head>
     <meta charset="UTF-8">
-    <title>Accueil</title>
+    <title>Accueil - Question aléatoire</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
@@ -19,12 +19,7 @@ if (!isset($_SESSION['user_id'])) {
     <?php include 'sidebar.php'; ?>
     <?php include 'header.php'; ?>
 
-    <!-- Boutons de sélection de mode -->
-    <div class="mode-buttons flex justify-center p-4">
-        <button id="open-btn" onclick="startMode('open')" class="mx-2 px-4 py-2 bg-green-500 text-white rounded-md">Open</button>
-        <button id="qcm-btn" onclick="startMode('qcm')" class="mx-2 px-4 py-2 bg-blue-500 text-white rounded-md">QCM</button>
-    </div>
-
+    <!-- No mode selection buttons – the question is chosen randomly -->
     <div class="main-content">
         <div class="chat-container bg-gray-800 border border-gray-700 rounded-lg shadow-md">
             <div id="chat-box" class="overflow-y-auto p-4 flex flex-col-reverse"></div>
@@ -36,8 +31,23 @@ if (!isset($_SESSION['user_id'])) {
     </div>
 
     <script>
-        let currentMode = ""; // 'open' ou 'qcm'
-        
+        // Change this value to match the total number of themes available.
+        const numberOfThemes = 13;
+        const types = ["open", "qcm"];
+
+        // This function returns a random integer between min and max (inclusive)
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Returns a random theme number and random type
+        function getRandomParameters() {
+            let randomTheme = getRandomInt(1, numberOfThemes);
+            let randomType = types[getRandomInt(0, types.length - 1)];
+            return { theme: randomTheme, type: randomType };
+        }
+
+        // Append a message to the chat history
         function appendMessage(text, sender) {
             let chatBox = document.getElementById("chat-box");
             let messageElement = document.createElement("div");
@@ -45,25 +55,21 @@ if (!isset($_SESSION['user_id'])) {
             messageElement.innerText = text;
             chatBox.prepend(messageElement);
         }
-        
-        function startMode(mode) {
-            currentMode = mode;
-            // Réinitialiser la conversation
-            document.getElementById("chat-box").innerHTML = "";
-            appendMessage("Mode sélectionné : " + mode.toUpperCase(), "bot");
-            getQuestion();
-        }
-        
-        function getQuestion() {
-            fetch('http://localhost:5000/ask?theme=1&type=' + currentMode)
+
+        // getRandomQuestion() chooses random parameters and then calls the /ask endpoint.
+        function getRandomQuestion() {
+            const params = getRandomParameters();
+            // Display which theme and type were chosen (optional debugging)
+            console.log("Random parameters: theme=" + params.theme + ", type=" + params.type);
+            fetch('http://localhost:5000/ask?theme=' + params.theme + '&type=' + params.type + "&_=" + new Date().getTime())
                 .then(response => response.json())
                 .then(data => {
                     console.log("Réponse de /ask:", data);
-                    if (currentMode === 'open') {
-                        appendMessage("Statement: " + data.enonce, "bot");
-                        appendMessage(data.question, "bot");
-                    } else if (currentMode === 'qcm') {
-                        appendMessage("Statement: " + data.enonce, "bot");
+                    if (params.type === 'open') {
+                        appendMessage("Statement (Theme " + params.theme + " - OPEN): " + data.enonce, "bot");
+                        appendMessage("Question: " + data.question, "bot");
+                    } else if (params.type === 'qcm') {
+                        appendMessage("Statement (Theme " + params.theme + " - QCM): " + data.enonce, "bot");
                         let answers = data.answers;
                         let optionsText = "";
                         for (let option in answers) {
@@ -72,16 +78,17 @@ if (!isset($_SESSION['user_id'])) {
                         appendMessage("Options: " + optionsText, "bot");
                     }
                 })
-                .catch(error => console.error('Erreur dans getQuestion:', error));
+                .catch(error => console.error('Erreur dans getRandomQuestion:', error));
         }
-        
+
+        // sendMessage() processes the answer and then always loads a new random question.
         function sendMessage() {
             let inputField = document.getElementById("message-input");
             let userMessage = inputField.value.trim();
             if (userMessage === "") return;
-            appendMessage(userMessage, "user");
+            appendMessage("Tu: " + userMessage, "user");
             inputField.value = "";
-            
+
             fetch('http://localhost:5000/answer', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -94,50 +101,21 @@ if (!isset($_SESSION['user_id'])) {
                 if(data.explanation) {
                     appendMessage("Explication: " + data.explanation, "bot");
                 }
-                if (data.next) {
-                    setTimeout(nextQuestion, 1000);
-                } else {
-                    setTimeout(getQuestion, 2000);
-                }
+                // After an answer, wait a moment and then load a new random question.
+                setTimeout(getRandomQuestion, 1500);
             })
             .catch(error => console.error('Erreur dans sendMessage:', error));
         }
-        
-        function nextQuestion() {
-            fetch('http://localhost:5000/next')
-                .then(response => response.json())
-                .then(data => {
-                    console.log("Réponse de /next:", data);
-                    if (data.done) {
-                        setTimeout(getQuestion, 2000);
-                    } else {
-                        if (currentMode === 'open') {
-                            appendMessage("Next Question", "bot");
-                            appendMessage(data.question, "bot");
-                        } else if (currentMode === 'qcm') {
-                            appendMessage("Next Question", "bot");
-                            appendMessage("Statement: " + data.enonce, "bot");
-                            let answers = data.answers;
-                            let optionsText = "";
-                            for (let option in answers) {
-                                optionsText += option + ": " + answers[option] + "    ";
-                            }
-                            appendMessage("Options: " + optionsText, "bot");
-                        }
-                    }
-                })
-                .catch(error => console.error('Erreur dans nextQuestion:', error));
-        }
-        
-        document.getElementById("message-input").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                sendMessage();
-            }
-        });
-        
-        // Message initial invitant à choisir un mode
+
+        // For this random-question page, we always start with a random question.
         window.onload = function() {
-            appendMessage("Veuillez sélectionner un mode : OPEN ou QCM", "bot");
+            appendMessage("Génération d'une question aléatoire...", "bot");
+            getRandomQuestion();
+            document.getElementById("message-input").addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    sendMessage();
+                }
+            });
         }
     </script>
 </body>
