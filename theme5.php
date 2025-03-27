@@ -22,7 +22,6 @@ if (!isset($_SESSION['user_id'])) {
     <div class="main-content">
         <h2 class="p-2 text-center font-bold text-3xl">Test your knowledge on the 5th theme</h2>
         
-        <!-- Mode selection buttons -->
         <div class="mode-buttons flex justify-center p-4">
             <button id="open-btn" onclick="startMode('open')" class="mx-2 px-4 py-2 bg-green-500 text-white rounded-md">Open</button>
             <button id="qcm-btn" onclick="startMode('qcm')" class="mx-2 px-4 py-2 bg-blue-500 text-white rounded-md">QCM</button>
@@ -31,13 +30,17 @@ if (!isset($_SESSION['user_id'])) {
         <div class="chat-container">
             <div id="chat-box"></div>
             <div class="chat-input">
-                <input type="text" id="message-input" placeholder="Écris un message..." autofocus>
-                <button onclick="sendMessage()">Envoyer</button>
+                <input type="text" id="message-input" placeholder="Write a message..." autofocus>
+                <button onclick="sendMessage()">Send</button>
             </div>
         </div>
     </div>
 
     <script>
+    	document.getElementById('theme-toggle').addEventListener('click', function() {
+    	document.body.classList.toggle('dark-mode'); // Change 'dark' en 'dark-mode'
+	});
+	
         let currentMode = ""; // 'open' or 'qcm'
         let openStatementComplete = false; // Flag for OPEN mode statement completion
 

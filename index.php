@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr" class="dark">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <title>Accueil - Question aléatoire</title>
@@ -15,39 +15,42 @@ if (!isset($_SESSION['user_id'])) {
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-900 text-gray-200">
+<body>
     <?php include 'sidebar.php'; ?>
     <?php include 'header.php'; ?>
 
-    <!-- No mode selection buttons – the question is chosen randomly -->
     <div class="main-content">
-        <div class="chat-container bg-gray-800 border border-gray-700 rounded-lg shadow-md">
+    	<h2 class="p-2 text-center font-bold text-3xl">Test your knowledge on the 13 themes</h2>
+        <div class="chat-container">
             <div id="chat-box" class="overflow-y-auto p-4 flex flex-col-reverse"></div>
-            <div class="chat-input flex border-t border-gray-700 p-2">
-                <input type="text" id="message-input" placeholder="Écris un message..." autofocus class="flex-grow border border-gray-700 rounded-md py-2 px-3 bg-gray-700 text-gray-200">
-                <button onclick="sendMessage()" class="ml-2 px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">Envoyer</button>
+            <div class="chat-input flex border-t p-2">
+                <input type="text" id="message-input" placeholder="Write a message..." autofocus>
+                <button onclick="sendMessage()">Send</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Change this value to match the total number of themes available.
+    	document.getElementById('theme-toggle').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+        });
+  
         const numberOfThemes = 13;
         const types = ["open", "qcm"];
 
-        // This function returns a random integer between min and max (inclusive)
+       
         function getRandomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        // Returns a random theme number and random type
+     
         function getRandomParameters() {
             let randomTheme = getRandomInt(1, numberOfThemes);
             let randomType = types[getRandomInt(0, types.length - 1)];
             return { theme: randomTheme, type: randomType };
         }
 
-        // Append a message to the chat history
+       
         function appendMessage(text, sender) {
             let chatBox = document.getElementById("chat-box");
             let messageElement = document.createElement("div");
@@ -56,7 +59,7 @@ if (!isset($_SESSION['user_id'])) {
             chatBox.prepend(messageElement);
         }
 
-        // getRandomQuestion() chooses random parameters and then calls the /ask endpoint.
+       
         function getRandomQuestion() {
             const params = getRandomParameters();
             // Display which theme and type were chosen (optional debugging)
@@ -81,7 +84,7 @@ if (!isset($_SESSION['user_id'])) {
                 .catch(error => console.error('Erreur dans getRandomQuestion:', error));
         }
 
-        // sendMessage() processes the answer and then always loads a new random question.
+        
         function sendMessage() {
             let inputField = document.getElementById("message-input");
             let userMessage = inputField.value.trim();
@@ -107,7 +110,7 @@ if (!isset($_SESSION['user_id'])) {
             .catch(error => console.error('Erreur dans sendMessage:', error));
         }
 
-        // For this random-question page, we always start with a random question.
+       
         window.onload = function() {
             appendMessage("Génération d'une question aléatoire...", "bot");
             getRandomQuestion();

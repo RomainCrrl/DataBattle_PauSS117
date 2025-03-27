@@ -1,4 +1,4 @@
-<button id="burger-menu" class="burger-menu fixed top-0 left-0 left-0 ml-4  rounded hover:opacity-80">
+<button id="burger-menu" class="burger-menu fixed mt-2  ml-4  rounded hover:opacity-80">
     ☰
 </button>
 <div class="sidebar fixed top-0 left-[-250px] w-[250px] h-full  text-white p-5 transition-all ease-in-out duration-300 z-50">
@@ -22,15 +22,16 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const burgerMenu = document.getElementById("burger-menu");
-        const sidebar = document.querySelector(".sidebar");
-        burgerMenu.addEventListener("click", function () {
-            sidebar.classList.toggle("active");
-            if (sidebar.classList.contains("active")) {
-                burgerMenu.classList.add("sidebar-active");
-            } else {
-                burgerMenu.classList.remove("sidebar-active");
-            }
-        });
+    const burgerMenu = document.getElementById("burger-menu");
+    const sidebar = document.querySelector(".sidebar");
+    burgerMenu.addEventListener("click", function () {
+        sidebar.classList.toggle("active");
+        if (sidebar.classList.contains("active")) {
+            burgerMenu.classList.add("active"); // Utilisez "active" ici
+        } else {
+            burgerMenu.classList.remove("active"); // Utilisez "active" ici
+        }
     });
+});
 </script>
+
