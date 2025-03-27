@@ -33,6 +33,9 @@ Enfin, il vous suffit d'installer les dernières dépendances :
 ```bash
 pip install Flask pandas fuzzywuzzy python-Levenshtein flask-cors
 ```
+```bash
+pip install Elasticsearch
+```
 
 Dernière étape. Aller dans le fichier config.php de notre projet et modifier le contenu des variables
 ```bash
