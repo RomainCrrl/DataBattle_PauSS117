@@ -2,31 +2,26 @@ import warnings
 warnings.filterwarnings("ignore", category=ResourceWarning)
 
 from flask import Flask, request, jsonify
-from flask_cors import CORS  # Pour autoriser les requêtes depuis l'interface web
+from flask_cors import CORS
 import pandas as pd
 import random
 import re
 from fuzzywuzzy import fuzz
 
 app = Flask(__name__)
-CORS(app)  # Autorise toutes les origines
+CORS(app) 
 
-# ==================== GLOBAL VARIABLES ====================
-# Open
 current_open_questions = []
 current_open_index = 0
 current_open_enonce = ""
 
-# QCM
 current_qcm_question = {}
 remaining_qcm_questions = []
 
-current_mode = None  # 'open' ou 'qcm'
+current_mode = None
 current_theme = 1
 
-# ==================== UTILS ====================
 def clean_columns(df):
-    # Supprimer les espaces en trop au début, à la fin et remplacer les espaces multiples par un seul
     df.columns = df.columns.str.strip().str.replace(r'\s+', ' ', regex=True)
     return df
 
@@ -38,7 +33,6 @@ def clean_answer(ans):
 def is_answer_correct(user_answer, correct_answer):
     return fuzz.partial_ratio(clean_answer(user_answer), clean_answer(correct_answer)) > 80
 
-# ==================== LOADERS ====================
 def load_open_file(theme_number):
     try:
         df = pd.read_excel(f"open_{theme_number:02d}.xlsx")
@@ -58,7 +52,6 @@ def load_qcm_file(theme_number):
         print(f"❌ Erreur chargement fichier qcm : {e}")
         return None
 
-# ==================== ROUTES ====================
 @app.route("/ask", methods=["GET"])
 def ask():
     global current_open_enonce, current_open_questions, current_open_index
@@ -93,7 +86,6 @@ def ask():
             })
 
         elif current_mode == "qcm":
-            # Charger le fichier QCM seulement si la file est vide
             if not remaining_qcm_questions:
                 df = load_qcm_file(current_theme)
                 if df is None:
