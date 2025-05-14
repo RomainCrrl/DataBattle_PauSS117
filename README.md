@@ -1,4 +1,4 @@
-Voici une version modifiée du README avec les étapes d'initialisation de la base de données MySQL ajoutées :
+Voici le README mis à jour avec les lignes pour assouplir la politique de mot de passe dans MySQL, placées **avant** la création de l'utilisateur `romain` :
 
 ---
 
@@ -48,9 +48,14 @@ Ouvrez un terminal et connectez-vous à MySQL :
 mysql -u root -p
 ```
 
-Entrez votre mot de passe administrateur MySQL, puis exécutez les commandes suivantes pour créer la base de données et la table `users` :
+Entrez votre mot de passe administrateur MySQL, puis exécutez les commandes suivantes :
 
 ```sql
+-- Assouplir la politique de mot de passe si nécessaire
+SET GLOBAL validate_password.policy = LOW;
+SET GLOBAL validate_password.length = 4;
+
+-- Création de la base de données et de la table users
 CREATE DATABASE dataBattle;
 USE dataBattle;
 
@@ -59,11 +64,8 @@ CREATE TABLE users (
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL
 );
-```
 
-Ensuite, créez l'utilisateur `romain` avec le mot de passe `bddromain` :
-
-```sql
+-- Création de l'utilisateur avec mot de passe simple
 CREATE USER 'romain'@'localhost' IDENTIFIED BY 'bddromain';
 GRANT ALL PRIVILEGES ON dataBattle.* TO 'romain'@'localhost';
 FLUSH PRIVILEGES;
@@ -89,7 +91,7 @@ Une fois toutes ces étapes réalisées, ouvrez votre navigateur préféré et r
 
 ## Contribution
 
-[Volodia GROMYKHOV]
-[Romain CORRAL]
-[Marc-Antoine ORECCHIONI]
-[Matthias RADIN]
+\[Volodia GROMYKHOV]
+\[Romain CORRAL]
+\[Marc-Antoine ORECCHIONI]
+\[Matthias RADIN]
