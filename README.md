@@ -1,7 +1,3 @@
-Voici le README mis à jour avec les lignes pour assouplir la politique de mot de passe dans MySQL, placées **avant** la création de l'utilisateur `romain` :
-
----
-
 # DataBattle - PauSS117
 
 ## Installation
