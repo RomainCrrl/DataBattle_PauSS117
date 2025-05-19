@@ -34,6 +34,14 @@ Installez ensuite les dépendances nécessaires :
 ```bash
 pip install Flask pandas fuzzywuzzy python-Levenshtein flask-cors
 pip install Elasticsearch
+pip install openpyxl
+```
+
+Pour que PHP puisse se connecter à MySQL, installez aussi l’extension PHP suivante :
+
+```bash
+sudo apt update
+sudo apt install php-mysql
 ```
 
 ## Initialisation de la base de données MySQL
